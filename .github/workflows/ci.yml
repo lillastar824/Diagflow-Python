@@ -1,0 +1,57 @@
+name: Continuous Integration
+
+on:
+  pull_request:
+    types: [opened, edited, synchronize, reopened, ready_for_review, converted_to_draft]
+    branches-ignore:
+      - main
+
+jobs:
+  check-branches:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check branches
+        run: |
+          if [ ${{ github.head_ref }} != "staging" ] && [ ${{ github.base_ref }} == "main" ]; then
+            echo "Merge requests to main branch are only allowed from staging branch."
+            exit 1
+          fi
+  pre-commit:
+    needs: check-branches
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-python@v2
+        with:
+          python-version: "3.11"
+          cache: "pip"
+      - uses: pre-commit/action@v2.0.0
+  deploy:
+    if: ${{github.base_ref == 'staging' && !github.event.pull_request.draft}}
+    needs: pre-commit
+    runs-on: ubuntu-latest
+    environment: dev
+    steps:
+      - uses: actions/checkout@v2
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+      - name: Authenticate to Google Cloud
+        uses: google-github-actions/auth@v1
+        with:
+          credentials_json: "${{ secrets.GCP_SA_DIAGFLOW }}"
+      - name: Set up Cloud SDK
+        uses: google-github-actions/setup-gcloud@v1
+      - name: Run main.py
+        run: |
+          python src/main.py
+        env:
+          AGENT_DISPLAY_NAME_ARCHIEVE: ${{ vars.AGENT_DISPLAY_NAME_ARCHIEVE }}
+          AGENT_DISPLAY_NAME: ${{ github.head_ref }}
+          GCS_BUCKET_URI_TO_RESTORE: ${{ vars.GCS_BUCKET_URI_TO_RESTORE }}
+          LOCATION: ${{ vars.LOCATION }}
+          PROJECT_ID: ${{ vars.PROJECT_ID }}
+          DIAGFLOW_URL: ${{ vars.DIAGFLOW_URL}}
+          AUDIO_EXPORT_GCS_URL: ${{ vars.AUDIO_EXPORT_GCS_URL }}
+          UPSERT_DATA_INTO_SPANNER_URL: ${{ vars.UPSERT_DATA_INTO_SPANNER_URL }}

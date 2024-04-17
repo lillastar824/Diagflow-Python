@@ -1,0 +1,18 @@
+[[source]]
+url = "https://pypi.org/simple"
+verify_ssl = true
+name = "pypi"
+
+[packages]
+dfcx-scrapi = "==1.10.0"
+google-cloud-dialogflow-cx = "==1.30.0"
+
+[dev-packages]
+black = "==23.12.1"
+pre-commit = "==3.5.0"
+
+[requires]
+python_version = "3.11"
+
+[pipenv]
+allow_prereleases = false

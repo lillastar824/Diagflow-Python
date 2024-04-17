@@ -1,0 +1,79 @@
+name: Process Stage JSON and Create PR for Uat/Prod
+
+on:
+  workflow_dispatch:
+
+jobs:
+  process-and-create-pr_uat:
+    runs-on: ubuntu-latest
+    environment: qa
+    steps:
+      - name: Checkout the workflow repository
+        uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.CHS_AGENT_PR }}
+          repository: denimhealth/chs-agent
+          ref: qa
+      - name : Add current_repo folder to .gitignore
+        run  : |
+          echo "current_repo/" >> .gitignore
+      # Assuming you have updated .gitignore to exclude script-repo
+
+      - name: Checkout the branch with the Python script
+        uses: actions/checkout@v4
+        with:
+          path: current_repo
+          ref: staging
+
+      - name: Run Python Script
+        run: python current_repo/.github/workflows/replace_strings.py ${{ github.workspace }}
+        env:
+          REPLACEMENTS: ${{ vars.REPLACEMENTS_UAT }}
+
+      - name: Create Pull Request
+        uses: peter-evans/create-pull-request@v6
+        with:
+          token: ${{ secrets.CHS_AGENT_PR }}
+          commit-message: Replace strings for UAT deployment
+          title: 'Replace strings for UAT deployment'
+          body: 'This PR includes string replacements for UAT deployment.'
+          # name the branch with update-strings-timestamp
+          branch: update-strings-${{ github.run_id }}
+          base: uat
+  
+  process-and-create-pr_prod:
+    runs-on: ubuntu-latest
+    environment: qa
+    steps:
+      - name: Checkout the workflow repository
+        uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.CHS_AGENT_PR }}
+          repository: denimhealth/chs-agent
+          ref: qa
+      - name : Add current_repo folder to .gitignore
+        run  : |
+          echo "current_repo/" >> .gitignore
+      # Assuming you have updated .gitignore to exclude script-repo
+
+      - name: Checkout the branch with the Python script
+        uses: actions/checkout@v4
+        with:
+          path: current_repo
+          ref: staging
+
+      - name: Run Python Script
+        run: python current_repo/.github/workflows/replace_strings.py ${{ github.workspace }}
+        env:
+          REPLACEMENTS: ${{ vars.REPLACEMENTS_PROD }}
+
+      - name: Create Pull Request
+        uses: peter-evans/create-pull-request@v6
+        with:
+          token: ${{ secrets.CHS_AGENT_PR }}
+          commit-message: Replace strings for UAT deployment
+          title: 'Replace strings for Prod deployment'
+          body: 'This PR includes string replacements for Prod deployment.'
+          # name the branch with update-strings-timestamp
+          branch: update-strings-${{ github.run_id }}
+          base: main

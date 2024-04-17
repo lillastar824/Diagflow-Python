@@ -1,0 +1,24 @@
+cachetools==5.3.3
+certifi==2024.2.2
+charset-normalizer==3.3.2
+dfcx-scrapi @ git+https://github.com/denimhealth/dfcx-scrapi.git@b8848f0c976038551d7f2d1dd02b5df243554b4f
+google-api-core==2.17.1
+google-auth==2.28.1
+google-cloud-dialogflow-cx==1.32.0
+googleapis-common-protos==1.62.0
+grpcio==1.62.0
+grpcio-status==1.62.0
+idna==3.6
+numpy==1.26.4
+pandas==2.2.1
+proto-plus==1.23.0
+protobuf==4.25.3
+pyasn1==0.5.1
+pyasn1-modules==0.3.0
+python-dateutil==2.9.0.post0
+pytz==2024.1
+requests==2.31.0
+rsa==4.9
+six==1.16.0
+tzdata==2024.1
+urllib3==2.2.1

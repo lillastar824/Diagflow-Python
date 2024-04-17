@@ -1,0 +1,40 @@
+# Tool-specific configurations
+# Black code formatter
+[tool.black]
+line-length = 79
+target-version = ['py311']
+include = '\.pyi?$'
+exclude = '''
+/(
+    \.eggs
+    | \.git
+    | \.hg
+    | \.mypy_cache
+    | \.tox
+    | \.venv
+    | _build
+    | buck-out
+    | build
+    | dist
+)/
+'''
+
+# Pytest configuration
+[tool.pytest.ini_options]
+pythonpath = [
+  ".", "health_data", "reporting", "resource_matrix", "llm_helpers"
+]
+
+# isort configuration for import sorting
+[tool.isort]
+profile = "black"
+
+# Flake8 configuration for style guide enforcement
+[tool.flake8]
+max-line-length = 79
+exclude = [
+    ".git",
+    "dist",
+    "build",
+    "*.egg-info",
+]
